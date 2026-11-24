@@ -5,6 +5,13 @@ Behavior under test: running `python3 main.py` with $MAKEFUN_OUTPUT_DIR
 pointing at an empty directory writes exactly one UTF-8 text file
 entry.txt holding a single sentence of 1-200 characters, and two runs
 produce byte-identical output (deterministic, no network, no randomness).
+
+The sentence itself is the deliverable, so the suite also guards its
+content, not just its shape: the line has to confess what actually
+broke. A pipeline can report green while the only step that executed
+was a formatter, and this entry exists to say that out loud. If the
+wording ever drifts away from that confession — no formatter, no
+unverified code — the content test below fails on purpose.
 """
 import os
 import subprocess
@@ -57,6 +64,17 @@ def test_entry_is_a_single_sentence():
         assert text.endswith("."), "entry must end with a period"
         assert text.count(".") == 1, "entry must be a single sentence"
         assert "?" not in text and "!" not in text
+
+
+def test_entry_names_the_real_failure():
+    with tempfile.TemporaryDirectory() as tmp:
+        run_main(Path(tmp))
+        text = read_entry(Path(tmp))
+        # The confession is the point: a green suite where only the
+        # formatter ran, leaving the code polished but unverified.
+        assert "formatter" in text, "entry must name what actually ran"
+        assert "unverified" in text, "entry must admit nothing was verified"
+        assert "passed" in text, "entry must keep the false-green claim"
 
 
 def test_entry_is_deterministic_across_runs():

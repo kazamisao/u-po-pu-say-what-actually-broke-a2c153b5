@@ -17,6 +17,15 @@ deterministic: no network, no randomness, no input read.
 
 > The tests all passed, because the only thing that ran was the formatter: the code is beautifully formatted and completely unverified.
 
+## Why this line
+
+Every engineer has seen the dashboard go green and felt relief —
+right up until someone asks what the pipeline actually executed.
+This entry compresses that moment into one sentence: the suite did
+not pass, it merely *reported* passing, because the single step that
+ran only reformatted the source. Clean code and verified code are
+different claims, and the joke lands on the gap between them.
+
 ## Run it
 
 ```sh
